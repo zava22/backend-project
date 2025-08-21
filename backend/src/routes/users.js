@@ -23,7 +23,7 @@ router.post("/register", async (req, res) => {
             return res.status(400).json({ message: "Email, phone va password kiritilishi shart" });
         }
 
-        // Agar email yoki phone allaqachon mavjud bo‘lsa
+        // Agar email yoki phone allaqachon mavjud bo'lsa
         const existingUser = await userModel.findOne({ $or: [{ email }, { phone }] });
         if (existingUser) {
             return res.status(400).json({ message: "Bunday foydalanuvchi mavjud" });
@@ -40,7 +40,7 @@ router.post("/register", async (req, res) => {
         });
 
         await newUser.save();
-        res.status(201).json({ message: "Ro'yxatdan o'tish muvaffaqiyatli", user: newUser });
+        res.status(201).json({ message: "Ro'yxatdan o'tish muvaffaqiyatli", user: { ...newUser.toObject(), password: undefined } });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Server xatosi" });
@@ -67,34 +67,77 @@ router.post("/login", async (req, res) => {
             return res.status(400).json({ message: "Noto'g'ri parol" });
         }
 
-        res.status(200).json({ message: "Muvaffaqiyatli login", user });
+        res.status(200).json({ message: "Muvaffaqiyatli login", user: { ...user.toObject(), password: undefined } });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Server xatosi" });
     }
 });
 
-// delete : /user/68a595240b90bbdbb11e4e9e
-
+// delete user by id
 router.delete("/:id", async (req, res) => {
-    try{
-        const { id } = req.params
-        const user = userModel.find
-
-    } catch(error) {
-         console.log(error);
+    try {
+        const { id } = req.params;
+        const user = await userModel.findByIdAndDelete(id);
+        
+        if (!user) {
+            return res.status(404).json({ message: "Foydalanuvchi topilmadi" });
+        }
+        
+        res.status(200).json({ message: "Foydalanuvchi muvaffaqiyatli o'chirildi" });
+    } catch (error) {
+        console.log(error);
         res.status(500).json({ message: "Server xatosi" });
     }
-})
+});
 
-// get simple user by id
+// update user by id
+router.put("/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { username, email, phone, profileImage } = req.body;
+        
+        // Check if email or phone already exists for other users
+        if (email || phone) {
+            const existingUser = await userModel.findOne({ 
+                $and: [
+                    { _id: { $ne: id } },
+                    { $or: [{ email }, { phone }] }
+                ]
+            });
+            if (existingUser) {
+                return res.status(400).json({ message: "Email yoki telefon raqami boshqa foydalanuvchi tomonidan ishlatilmoqda" });
+            }
+        }
+        
+        const updatedUser = await userModel.findByIdAndUpdate(
+            id,
+            { username, email, phone, profileImage },
+            { new: true, runValidators: true }
+        );
+        
+        if (!updatedUser) {
+            return res.status(404).json({ message: "Foydalanuvchi topilmadi" });
+        }
+        
+        res.status(200).json({ 
+            message: "Profil muvaffaqiyatli yangilandi", 
+            user: { ...updatedUser.toObject(), password: undefined } 
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Server xatosi" });
+    }
+});
+
+// get user by id
 router.get("/:id", async (req, res) => {
     try {
         const user = await userModel.findById(req.params.id);
         if (!user) {
             return res.status(404).json({ message: "Foydalanuvchi topilmadi" });
         }
-        res.status(200).json(user);
+        res.status(200).json({ ...user.toObject(), password: undefined });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Server xatosi" });
