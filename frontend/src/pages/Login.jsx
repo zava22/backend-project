@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { authAPI } from '../services/api';
+import './Login.css';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -38,75 +39,69 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-base-200 flex items-center justify-center">
-      <div className="card w-full max-w-sm shadow-2xl bg-base-100">
-        <form className="card-body" onSubmit={handleSubmit}>
-          <div className="text-center mb-4">
-            <h1 className="text-3xl font-bold">Sign In</h1>
-            <p className="text-base-content/60">Welcome back!</p>
-          </div>
+    <div className="login-container">
+      <div className="login-card">
+        <div className="login-header">
+          <h1>Welcome Back</h1>
+          <p>Sign in to your account</p>
+        </div>
 
+        <form className="login-form" onSubmit={handleSubmit}>
           {error && (
-            <div className="alert alert-error">
-              <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <div className="login-alert error">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span>{error}</span>
             </div>
           )}
 
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">Email</span>
-            </label>
+          <div className="form-group">
+            <label htmlFor="email">Email Address</label>
             <input
               type="email"
+              id="email"
               name="email"
-              placeholder="email@example.com"
-              className="input input-bordered"
+              placeholder="Enter your email"
+              className="form-input"
               value={formData.email}
               onChange={handleChange}
               required
             />
           </div>
 
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">Password</span>
-            </label>
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
             <input
               type="password"
+              id="password"
               name="password"
-              placeholder="password"
-              className="input input-bordered"
+              placeholder="Enter your password"
+              className="form-input"
               value={formData.password}
               onChange={handleChange}
               required
             />
-            <label className="label">
-              <a href="#" className="label-text-alt link link-hover">Forgot password?</a>
-            </label>
+            <div className="forgot-password">
+              <a href="#">Forgot your password?</a>
+            </div>
           </div>
 
-          <div className="form-control mt-6">
-            <button 
-              type="submit" 
-              className={`btn btn-primary ${loading ? 'loading' : ''}`}
-              disabled={loading}
-            >
-              {loading ? 'Signing In...' : 'Sign In'}
-            </button>
-          </div>
-
-          <div className="text-center mt-4">
-            <p className="text-sm">
-              Don't have an account?{' '}
-              <Link to="/register" className="link link-primary">
-                Sign up here
-              </Link>
-            </p>
-          </div>
+          <button 
+            type="submit" 
+            className={`submit-btn ${loading ? 'loading' : ''}`}
+            disabled={loading}
+          >
+            {loading ? 'Signing In...' : 'Sign In'}
+          </button>
         </form>
+
+        <div className="login-footer">
+          <p>
+            Don't have an account?{' '}
+            <Link to="/register">Create one here</Link>
+          </p>
+        </div>
       </div>
     </div>
   );

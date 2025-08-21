@@ -1,38 +1,51 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
+import './Home.css';
 
 const Home = () => {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-base-200">
-      <div className="hero min-h-screen bg-base-200">
-        <div className="hero-content text-center">
-          <div className="max-w-md">
-            <h1 className="text-5xl font-bold">Hello there!</h1>
-            <p className="py-6">
-              {user 
-                ? `Welcome back, ${user.username || user.email}! Manage your profile and explore our features.`
-                : 'Welcome to our amazing app! Sign up or sign in to get started.'
-              }
-            </p>
-            {user ? (
-              <Link to="/profile" className="btn btn-primary">
-                Go to Profile
-              </Link>
-            ) : (
-              <div className="flex gap-4 justify-center">
-                <Link to="/register" className="btn btn-primary">
-                  Get Started
-                </Link>
-                <Link to="/login" className="btn btn-outline">
-                  Sign In
-                </Link>
+    <div className="home-container">
+      <div className="hero-section">
+        <h1 className="hero-title">Welcome to MyApp</h1>
+        <p className="hero-subtitle">
+          {user 
+            ? `Hello ${user.username || user.email}! Ready to explore amazing features?`
+            : 'Discover amazing features and connect with our community. Join us today!'
+          }
+        </p>
+        
+        {user ? (
+          <div className="welcome-back">
+            <div className="user-info">
+              <img
+                src={user.profileImage || "https://static.vecteezy.com/system/resources/thumbnails/024/624/549/small_2x/3d-rendering-person-icon-3d-render-blue-user-sign-icon-png.png"}
+                alt="Profile"
+                className="user-avatar-large"
+              />
+              <div className="user-details">
+                <h3>{user.username || 'User'}</h3>
+                <p>{user.email}</p>
               </div>
-            )}
+            </div>
+            <div className="hero-actions">
+              <Link to="/profile" className="btn btn-primary">
+                Manage Profile
+              </Link>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="hero-actions">
+            <Link to="/register" className="btn btn-primary">
+              Get Started
+            </Link>
+            <Link to="/login" className="btn btn-outline">
+              Sign In
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
